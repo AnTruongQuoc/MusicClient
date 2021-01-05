@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-    Button,
+    //Button,
     Dimensions,
     StyleSheet,
     Text, TextInput,
@@ -12,7 +12,7 @@ import {
     Modal,
     Alert
 } from 'react-native';
-
+import {Button} from 'react-native-paper'
 import { Divider } from 'react-native-paper'
 import Song from '../../component/Song/Song';
 import { useStateValue } from '../../StateProvider';
@@ -24,13 +24,60 @@ const screen = Dimensions.get('screen')
 
 function PickSong(props) {
 
-    const [state, dispatch] = useStateValue()
+    const [state, dispatch] = useStateValue();
 
-    const [quantity, setQuantity] = useState(state.song?.length)
-
+    const [quantity, setQuantity] = useState(state.song?.length);
+    const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [songName, setSongName] = useState(null)
 
+    useEffect(() => {
+        setQuantity(state.song?.length)
+    }, [state])
+
+    const getSongFromAPI = async() => {
+        setLoading(true)
+        let URL_GETSONG = 'https://getsong.herokuapp.com/api.php'
+                        + `?customer=1`
+                        + `&shop=${state.storeID}`
+                        + `&token=${state.userToken}`
+                        + `&keyword=${songName}`
+
+        //console.log(URL_GETSONG)
+        let data = await fetch(URL_GETSONG)
+        .then(response => {
+           return response.text()
+        })
+        .then(text=> {
+            return text
+        })
+        .catch(error => {
+            return error
+        })
+
+        //console.log('DATA: ', data)
+        if(data){
+            let json = JSON.parse(data)
+            
+            if(!json.message){
+                let newsong = {
+                    name: json.song,
+                    author: json.singer
+                }
+                dispatch({
+                    type: 'ADD_SONG',
+                    newsong: newsong
+                })
+                setLoading(false)
+            }
+            else {
+                setLoading(false)
+            }
+        }
+
+        setModalVisible(false)
+        setSongName('')
+    }
 
     const logOut = () => {
         dispatch({
@@ -38,6 +85,15 @@ function PickSong(props) {
             userToken: null,
             storeID: null
         })
+    }
+
+    const handleOpenAddSong = () => {
+        if(quantity === 5){
+            Alert.alert('Your token is out of request. ')
+        }
+        else {
+            setModalVisible(true)
+        }
     }
 
     return (
@@ -70,12 +126,16 @@ function PickSong(props) {
                             style={styles.inputField}
                         />
                         <Button 
-                            title='SEND' 
-                            onPress={() => setModalVisible(false)}
+                            title='SEND'
+                            loading={loading}
+                            mode="contained"
+                            onPress={() => getSongFromAPI()}
                             style={{
                                 borderRadius: 8
                             }} 
-                        />
+                        > 
+                            SEND
+                        </Button>
                     </View>
                 </View>
             </Modal>
@@ -200,7 +260,7 @@ function PickSong(props) {
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}
-                        onPress={() => setModalVisible(true)}
+                        onPress={() => handleOpenAddSong()}
                     >
                         <Image
                             style={{

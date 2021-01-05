@@ -15,10 +15,6 @@ export const initialState = {
         {
             name: 'Havana',
             author: 'Camila Cabello ft. Young Thug'
-        },
-        {
-            name: 'Havana',
-            author: 'Camila Cabello ft. Young Thug'
         }
     ],
     userToken: null,
@@ -30,11 +26,14 @@ export const reducer = (state, action) => {
     switch (action.type) {
 
         case 'ADD_SONG':
-            return {
-                ...state,
-                song: [...state.song, action.item],
+            if (state.song.length < 5) {
+                return {
+                    ...state,
+                    song: [...state.song, action.newsong],
+                }
             }
-        
+            else
+                return
 
         case 'SET_USER_TOKEN':
             return {
