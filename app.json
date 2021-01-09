@@ -23,11 +23,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.antruongquoc.MusicReactNative"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "description": ""
+    "description": "Demo",
+    "githubUrl": "https://github.com/AnTruongQuoc/MusicClient"
   }
 }

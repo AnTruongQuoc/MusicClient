@@ -20,7 +20,7 @@ function Navigator(props) {
                 }}
             >
                 {
-                    state.userToken === null ? (
+                    state?.userToken === null ? (
                         <Stack.Screen name='Login' component={Login} />
                     ) : (
                             <>

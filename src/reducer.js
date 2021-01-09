@@ -16,14 +16,16 @@ export const reducer = (state, action) => {
             }
 
         case 'ADD_SONG':
-            if (state.song.length < 5) {
+            if (state.song.length < 1000) {
                 return {
                     ...state,
                     song: [...state.song, action.newsong],
                 }
             }
             else
-                return
+                return {
+                    ...state
+                }
 
         case 'REMOVE_SONGS_LOGOUT':
             return {

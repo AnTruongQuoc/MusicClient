@@ -26,6 +26,7 @@ function PickSong(props) {
 
     const [state, dispatch] = useStateValue();
 
+    const [limit, setLimit] = useState(1000);
     const [quantity, setQuantity] = useState(state.song?.length);
     const [loading, setLoading] = useState(false);
     const [loadSong, setLoadSong] = useState(false);
@@ -110,9 +111,10 @@ function PickSong(props) {
 
             if (json.status === '200') {
                 let newsong = {
-                    name: json.message.song,
-                    author: json.message.singer
+                    SongName: json.message.song,
+                    Artist: json.message.singer
                 }
+                console.log('New songggg: ', newsong)
                 dispatch({
                     type: 'ADD_SONG',
                     newsong: newsong
@@ -120,6 +122,7 @@ function PickSong(props) {
                 setLoading(false)
                 setMessage('Add Successfully')
                 showDialog()
+                console.log('Songggg state: ', state.song)
             }
             else if (json.status === '404') {
                 setLoading(false)
@@ -144,7 +147,7 @@ function PickSong(props) {
     }
 
     const handleOpenAddSong = () => {
-        if (quantity >= 5) {
+        if (quantity >= limit) {
             Alert.alert('Your token is out of request. ')
         }
         else {
@@ -280,7 +283,7 @@ function PickSong(props) {
                                 fontWeight: '500',
                                 fontSize: 14,
                             }}
-                        >{5 - quantity + ' request left'}</Text>
+                        >{limit - quantity + ' request left'}</Text>
                     </View>
                 </View>
 
@@ -296,8 +299,8 @@ function PickSong(props) {
                         }}
                     >
                         {
-                            state.song?.map((item, index) => {
-                                console.log('token: ' + state.userToken)
+                            state?.song.map((item, index) => {
+                                //console.log('token: ' + state.userToken)
                                 return (
                                     <Song key={index} data={item} />
                                 )
