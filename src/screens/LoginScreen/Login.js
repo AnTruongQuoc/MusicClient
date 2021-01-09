@@ -5,9 +5,12 @@ import {
     StyleSheet,
     Text, TextInput,
     View,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 } from 'react-native';
-import { Image } from 'react-native'
+import { Dialog, Portal, Paragraph } from 'react-native-paper';
+import { Button as ButtonPaper } from 'react-native-paper'
+import { Image } from 'react-native';
 import { useStateValue } from '../../StateProvider';
 
 
@@ -15,19 +18,60 @@ export default function Login(props) {
     const screen = Dimensions.get('screen')
     const [storeID, setStoreID] = useState(null)
     const [token, setToken] = useState(null)
+    const [customerID, setCustomerID] = useState(null)
     const [state, dispatch] = useStateValue()
-    
 
-    const setUserTokenAndStoreID = () => {
-        dispatch({
-            type: 'SET_USER_TOKEN',
-            token: token
-        })
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState(null)
+    const [visible, setVisible] = React.useState(false);
+    const showDialog = () => setVisible(true);
+    const hideDialog = () => setVisible(false);
 
-        dispatch({
-            type: 'SET_STORE_ID',
-            storeID: storeID
-        })
+    const setUserTokenAndStoreID = async () => {
+        setLoading(true)
+
+        var URL_LOGIN = 'https://getsong.herokuapp.com/login.php'
+            + `?shop=${storeID}`
+            + `&customer=${customerID}`
+            + `&token=${token}`
+
+        let login = await fetch(URL_LOGIN)
+            .then(response => {
+                return response.text()
+            })
+            .then(text => {
+                return text
+            })
+            .catch(error => {
+                Alert.alert('Error 500')
+                return null
+            })
+
+        if (login) {
+            let response = JSON.parse(login)
+
+            if (response?.status === '200') {
+                dispatch({
+                    type: 'SET_USER_TOKEN',
+                    token: token
+                })
+                dispatch({
+                    type: 'SET_USER_ID',
+                    customerID: customerID
+                })
+                dispatch({
+                    type: 'SET_STORE_ID',
+                    storeID: storeID
+                })
+            }
+            else if (response?.status === '404') {
+                setMessage(response?.message)
+                showDialog()
+            }
+        }
+
+        setLoading(false)
+
     }
     return (
         <View style={styles.container}>
@@ -60,6 +104,13 @@ export default function Login(props) {
                     style={[styles.top, { width: screen.width * 0.8 }]}
                 />
                 <TextInput
+                    placeholder='Customer ID'
+                    autoCapitalize='characters'
+                    defaultValue={customerID}
+                    onChangeText={text => setCustomerID(text)}
+                    style={styles.middle}
+                />
+                <TextInput
                     placeholder='User token'
                     autoCapitalize='characters'
                     defaultValue={token}
@@ -69,24 +120,43 @@ export default function Login(props) {
 
                 <View style={{
                     marginTop: 25,
-                    
-                }}>
-                    <TouchableOpacity
 
+                }}>
+                    
+
+                    <ButtonPaper
+                        title='SUBMIT'
+                        loading={loading}
+                        mode="contained"
+                        disabled={loading}
+                        onPress={() => setUserTokenAndStoreID()}
                         style={{
                             borderRadius: 8,
-                            backgroundColor: '#6C63FF',
-                            padding: 12,
+                            backgroundColor: loading ? '#a19bff': '#6C63FF',
+                            padding: 5,
                             elevation: 8
                         }}
-
-                        onPress={() => setUserTokenAndStoreID()}
                     >
-                        <Text style={{alignSelf: 'center', color: '#fff'}}>SUBMIT</Text>
-                    </TouchableOpacity>
+                        <Text style={{ alignSelf: 'center', color: loading ? '#303030' : '#fff' }}>
+                            {
+                                loading ? 'WAITING' : 'SUBMIT'
+                            }
+                        </Text>
+                    </ButtonPaper>
                 </View>
             </View>
 
+            <Portal>
+                <Dialog visible={visible} onDismiss={hideDialog}>
+                    <Dialog.Title>Notice</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>{message ? message : ''}</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button title='Close' onPress={hideDialog} />
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
 
         </View>
     )
@@ -123,6 +193,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "beige",
         borderWidth: 1,
+    },
+    middle: {
+        padding: 10,
+        backgroundColor: "#fff",
+        borderWidth: 1,
+        borderTopWidth: 0.1,
+        borderColor: '#33C7E8',
     },
     bottom: {
         padding: 10,
