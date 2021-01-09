@@ -55,7 +55,7 @@ function InfoScreen(props) {
                     <Text
                         style={{
                             color: '#fff',
-                            width: 80
+                            width: 100
                         }}
                     >
                         Store ID
@@ -69,12 +69,31 @@ function InfoScreen(props) {
                         {state.storeID}
                     </Text>
                 </View>
+                
+                <View style={[styles.displayInfo]}>
+                    <Text
+                        style={{
+                            color: '#fff',
+                            width: 100
+                        }}
+                    >
+                        Customer ID
+                    </Text>
+                    <Text
+                        style={{
+                            color: '#fff',
+
+                        }}
+                    >
+                        {state.customerID}
+                    </Text>
+                </View>
 
                 <View style={[styles.displayInfo,{marginBottom: 15}]}>
                     <Text
                         style={{
                             color: '#fff',
-                            width: 80
+                            width: 100
                         }}
                     >
                         Token

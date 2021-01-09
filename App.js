@@ -8,7 +8,7 @@ import { initialState, reducer } from './src/reducer'
 
 import SplashScreen from './src/screens/SplashScreen/SplashScreen'
 import Navigator from './src/Navigator';
-
+import {Provider} from 'react-native-paper'
 
 
 
@@ -52,7 +52,9 @@ function App() {
       initialState={initialState}
       reducer={reducer}
     >
+     <Provider>
       <Navigator />
+     </Provider>
     </StateProvider>
   )
 }
