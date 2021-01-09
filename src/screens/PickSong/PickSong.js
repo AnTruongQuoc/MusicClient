@@ -12,11 +12,11 @@ import {
     Modal,
     Alert
 } from 'react-native';
-import {Button} from 'react-native-paper'
+import { Button } from 'react-native-paper'
 import { Divider } from 'react-native-paper'
 import Song from '../../component/Song/Song';
 import { useStateValue } from '../../StateProvider';
-
+import { Dialog, Portal, Paragraph } from 'react-native-paper';
 
 
 //Get size of phone screen
@@ -28,50 +28,99 @@ function PickSong(props) {
 
     const [quantity, setQuantity] = useState(state.song?.length);
     const [loading, setLoading] = useState(false);
+    const [loadSong, setLoadSong] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [songName, setSongName] = useState(null)
 
+    const [message, setMessage] = useState(null)
+    const [visible, setVisible] = React.useState(false);
+    const showDialog = () => setVisible(true);
+    const hideDialog = () => setVisible(false);
+
     useEffect(() => {
+
+
+        let URL_REQUESTED = 'https://getsong.herokuapp.com/songs.php'
+            + `?customer=${state.customerID}`
+            + `&shop=${state.storeID}`
+            + `&token=${state.userToken}`
+
+        const loadSongsFromAPI = async () => {
+            let songs = await fetch(URL_REQUESTED)
+                .then(response => {
+                    return response.text()
+                })
+                .then(text => {
+                    return text
+                })
+                .catch(error => {
+                    Alert.alert("Error: ", error)
+                    return null
+                })
+
+            if (songs) {
+
+                let res = JSON.parse(songs)
+                console.log('Load song', res.message)
+                if (res.status === '200') {
+                    dispatch({
+                        type: 'LOAD_SONG',
+                        songs: res.message
+                    })
+                }
+            }
+        }
+
+        if (!loadSong) {
+            loadSongsFromAPI()
+            setLoadSong(true)
+        }
         setQuantity(state.song?.length)
     }, [state])
 
-    const getSongFromAPI = async() => {
+    const getSongFromAPI = async () => {
         setLoading(true)
-        let URL_GETSONG = 'https://getsong.herokuapp.com/api.php'
-                        + `?customer=1`
-                        + `&shop=${state.storeID}`
-                        + `&token=${state.userToken}`
-                        + `&keyword=${songName}`
+        //https://getsong.herokuapp.com/api.php?keyword=thien%20duong&shop=101&customer=10001&token=1000001
+        let URL_GETSONG = 'https://getsong.herokuapp.com/apiv4.php'
+            + `?keyword=${songName}`
+            + `&shop=${state.storeID}`
+            + `&customer=${state.customerID}`
+            + `&token=${state.userToken}`
 
         //console.log(URL_GETSONG)
-        let data = await fetch(URL_GETSONG)
-        .then(response => {
-           return response.text()
-        })
-        .then(text=> {
-            return text
-        })
-        .catch(error => {
-            return error
-        })
+        let song = await fetch(URL_GETSONG)
+            .then(response => {
+                return response.text()
+            })
+            .then(text => {
+                return text
+            })
+            .catch(error => {
+                Alert.alert(error)
+                return null
+            })
+        //console.log('URL : ', URL_GETSONG)
+        //console.log('get Song: ', song)
+        if (song) {
+            let json = JSON.parse(song)
 
-        //console.log('DATA: ', data)
-        if(data){
-            let json = JSON.parse(data)
-            
-            if(!json.message){
+            if (json.status === '200') {
                 let newsong = {
-                    name: json.song,
-                    author: json.singer
+                    name: json.message.song,
+                    author: json.message.singer
                 }
                 dispatch({
                     type: 'ADD_SONG',
                     newsong: newsong
                 })
                 setLoading(false)
+                setMessage('Add Successfully')
+                showDialog()
             }
-            else {
+            else if (json.status === '404') {
                 setLoading(false)
+                setMessage('Add Failed')
+                showDialog()
             }
         }
 
@@ -85,10 +134,13 @@ function PickSong(props) {
             userToken: null,
             storeID: null
         })
+        dispatch({
+            type: 'REMOVE_SONGS_LOGOUT'
+        })
     }
 
     const handleOpenAddSong = () => {
-        if(quantity === 5){
+        if (quantity === 5) {
             Alert.alert('Your token is out of request. ')
         }
         else {
@@ -125,16 +177,38 @@ function PickSong(props) {
                             onChangeText={(text) => setSongName(text)}
                             style={styles.inputField}
                         />
-                        <Button 
+                        <Button
                             title='SEND'
                             loading={loading}
                             mode="contained"
                             onPress={() => getSongFromAPI()}
                             style={{
-                                borderRadius: 8
-                            }} 
-                        > 
-                            SEND
+                                borderRadius: 8,
+                                backgroundColor: loading ? '#a19bff' : '#6C63FF',
+                                elevation: 8
+                            }}
+                        >
+                            <Text style={{ alignSelf: 'center', color: loading ? '#303030' : '#fff' }}>
+                                {
+                                    loading ? 'SENDING' : 'SEND'
+                                }
+                            </Text>
+                        </Button>
+
+                        <Button
+                            title='SEND'
+                            mode="outlined"
+                            onPress={() => setModalVisible(false)}
+                            style={{
+                                borderRadius: 8,
+                                marginTop: 5,
+                                backgroundColor: '#FFF',
+                                //elevation: 8
+                            }}
+                        >
+                            <Text style={{ alignSelf: 'center', color: '#303030' }}>
+                                CLOSE
+                            </Text>
                         </Button>
                     </View>
                 </View>
@@ -291,6 +365,17 @@ function PickSong(props) {
                 </View>
             </View>
 
+            <Portal>
+                <Dialog visible={visible} onDismiss={hideDialog}>
+                    <Dialog.Title>Notice</Dialog.Title>
+                    <Dialog.Content>
+                        <Paragraph>{message ? message : ''}</Paragraph>
+                    </Dialog.Content>
+                    <Dialog.Actions>
+                        <Button title='Close' onPress={hideDialog} />
+                    </Dialog.Actions>
+                </Dialog>
+            </Portal>
         </View>
 
     )
@@ -333,7 +418,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        
+
     },
     boxAddSong: {
         width: screen.width * 0.8,
