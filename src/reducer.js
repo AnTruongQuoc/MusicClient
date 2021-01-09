@@ -10,10 +10,11 @@ export const reducer = (state, action) => {
     switch (action.type) {
 
         case 'LOAD_SONG':
-            return{
+            return {
                 ...state,
-                song: [...state.song, ...action.songs]
+                song: action.songs
             }
+
         case 'ADD_SONG':
             if (state.song.length < 5) {
                 return {
@@ -23,11 +24,18 @@ export const reducer = (state, action) => {
             }
             else
                 return
-        
+
         case 'REMOVE_SONGS_LOGOUT':
-            return{
+            return {
                 ...state,
                 song: []
+            }
+        case 'SET_USER':
+            return {
+                ...state,
+                userToken: action.token,
+                customerID: action.customerID,
+                storeID: action.storeID
             }
         case 'SET_USER_TOKEN':
             return {
@@ -35,12 +43,12 @@ export const reducer = (state, action) => {
                 userToken: action.token
             }
         case 'SET_USER_ID':
-            return{
+            return {
                 ...state,
                 customerID: action.customerID
             }
         case 'SET_USER_LOG_OUT':
-            return{
+            return {
                 ...state,
                 userToken: action.userToken,
                 storeID: action.storeID

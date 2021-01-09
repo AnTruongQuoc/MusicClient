@@ -57,11 +57,13 @@ function PickSong(props) {
                     Alert.alert("Error: ", error)
                     return null
                 })
-
+            
+            console.log('URLLL', URL_REQUESTED);
             if (songs) {
 
                 let res = JSON.parse(songs)
-                console.log('Load song', res.message)
+                console.log('JSON', JSON.stringify(res));
+
                 if (res.status === '200') {
                     dispatch({
                         type: 'LOAD_SONG',
@@ -74,7 +76,9 @@ function PickSong(props) {
         if (!loadSong) {
             loadSongsFromAPI()
             setLoadSong(true)
+            console.log('SONGS', state.song)
         }
+        
         setQuantity(state.song?.length)
     }, [state])
 
@@ -140,7 +144,7 @@ function PickSong(props) {
     }
 
     const handleOpenAddSong = () => {
-        if (quantity === 5) {
+        if (quantity >= 5) {
             Alert.alert('Your token is out of request. ')
         }
         else {

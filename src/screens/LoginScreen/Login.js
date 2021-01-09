@@ -52,16 +52,11 @@ export default function Login(props) {
 
             if (response?.status === '200') {
                 dispatch({
-                    type: 'SET_USER_TOKEN',
-                    token: token
-                })
-                dispatch({
-                    type: 'SET_USER_ID',
-                    customerID: customerID
-                })
-                dispatch({
-                    type: 'SET_STORE_ID',
+                    type: 'SET_USER',
+                    token: token,
+                    customerID: customerID,
                     storeID: storeID
+
                 })
             }
             else if (response?.status === '404') {

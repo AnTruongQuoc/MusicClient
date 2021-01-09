@@ -33,7 +33,7 @@ function Song(props) {
                         fontWeight: 'bold'
                     }}
                 >
-                    {props.data.name}
+                    {props.data.SongName}
                 </Text>
                 <Text
                     style={{
@@ -43,7 +43,7 @@ function Song(props) {
                         marginBottom: 15
                     }}
                 >
-                    {props.data.author}
+                    {props.data.Artist}
                 </Text>
                 <Divider />
             </View>
