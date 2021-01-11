@@ -16,7 +16,7 @@ export const reducer = (state, action) => {
             }
 
         case 'ADD_SONG':
-            if (state.song.length < 1000) {
+            if (state.song.length < 20) {
                 return {
                     ...state,
                     song: [...state.song, action.newsong],

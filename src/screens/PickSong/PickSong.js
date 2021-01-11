@@ -26,7 +26,7 @@ function PickSong(props) {
 
     const [state, dispatch] = useStateValue();
 
-    const [limit, setLimit] = useState(1000);
+    const [limit, setLimit] = useState(20);
     const [quantity, setQuantity] = useState(state.song?.length);
     const [loading, setLoading] = useState(false);
     const [loadSong, setLoadSong] = useState(false);
@@ -252,7 +252,7 @@ function PickSong(props) {
                                 fontSize: 14
                             }}
                         >
-                            Only 5 request for every token </Text>
+                            Only {limit} request for every token </Text>
                     </View>
                 </View>
                 <View >

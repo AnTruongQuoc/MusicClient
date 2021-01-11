@@ -17,7 +17,7 @@ export default function SplashScreen(props){
     return(
         <View style={viewStyles}>
             <Text style={textStyles}>
-                Intro title
+                WELCOME
             </Text>
         </View>
     )
