@@ -11,7 +11,7 @@ When you buy something in store, you will receive a token and store id of this s
 **How to run**
 [Android] Please instaill Expo app in your phone to run.
 
-[PC] Please install Expo: <code>npm instal -g expo-cli</code> 
+[PC] Please install Expo: <code>npm install -g expo-cli</code> 
 
 and run: <code>npm install</code> in project directory to install all packages before running
 
